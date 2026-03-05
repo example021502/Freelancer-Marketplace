@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+:root {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+@utility no-scrollbar {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@theme {
+  --background-image-linear_gradient: linear-gradient(
+    to right,
+    #013691,
+    rgba(1, 54, 145, 0.8),
+    rgba(1, 187, 180, 0.8),
+    #01bbb4
+  );
+}
