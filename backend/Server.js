@@ -34,25 +34,21 @@ app.get("/api/get/Users", (req, res) => {
   });
 });
 
-app.get("/api/login", (req, res) => {
-  const sql = "SELECT username, password FROM Users";
+app.post("/api/login", (req, res) => {
+  const sql = "SELECT password FROM Users WHERE username = ?";
   const { username, password } = req.body;
 
-  const users = [];
-  pool.query(sql, async (error, result) => {
-    if (error) return res.status(500).send(error);
-    else {
-      users.push(result);
-      const user = users.find((user) => user.username === username);
-      if (!user) {
-        res.send({ type: "text", text: "No user found" });
-        return;
-      }
-      const isValid = await bcrypt.compare(password, user.password);
-      if (!isValid) {
-        res.send({ type: "error", text: "Wrong Password" });
-        return;
-      }
+  pool.query(sql, [username], async (error, result) => {
+    if (error)
+      return res.status(500).send({ type: "error", text: "Database error" });
+    if (result.length === 0)
+      return res.status(404).send({ type: "error", text: "No User found" });
+    const user = result[0];
+
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) {
+      res.send({ type: "error", text: "Wrong Password" });
+      return;
     }
 
     res.send({ type: "success", text: "Login Successfully" });

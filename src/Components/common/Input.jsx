@@ -1,9 +1,18 @@
 import React from "react";
 
-function Input({ placeholder, value, onchange, id, class_name, type }) {
+function Input({
+  placeholder,
+  autocomplete,
+  value,
+  onchange,
+  id,
+  class_name,
+  type,
+}) {
   return (
     <input
       type={type}
+      autoComplete={autocomplete}
       className={`${class_name}`}
       placeholder={placeholder}
       value={value}
