@@ -1,15 +1,16 @@
 import { lazy } from "react";
-import { BrowserRouter, Route, Router, Routes } from "react-router-dom";
-import Dashboard from "./Components/Dashboard/Dashboard";
-
-const Signing_page = lazy(() => import("./Components/Sign_pages/Signing_page"));
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import CatchAll from "./CatchAll";
+const Signup = lazy(() => import("./Components/signing/Signup"));
+const Signin = lazy(() => import("./Components/signing/Signin"));
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route index element={<Signing_page />} />
-        <Route path="dashboard" element={<Dashboard />} />
+        <Route index element={<Signin />} />
+        <Route path="signup" element={<Signup />} />
+        <Route path="*" element={<CatchAll />} />
       </Routes>
     </BrowserRouter>
   );

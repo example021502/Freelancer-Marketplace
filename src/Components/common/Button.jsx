@@ -1,12 +1,10 @@
 import React from "react";
 
-function Button({ text, class_name, id, type, onBtnClick }) {
+function Button({ class_name, text, onclick, id }) {
   return (
     <button
-      type={type}
-      onClick={() => onBtnClick(id)}
-      id={id}
-      className={`rounded-lg cursor hover:scale-[1.05] transition-all ease-in-out duration-200 ${class_name}`}
+      onClick={() => onclick(id)}
+      className={`cursor-pointer hover:scale-[1.05] transition-all ease-in-out duration-150 ${class_name}`}
     >
       {text}
     </button>
