@@ -16,11 +16,10 @@ import SelectRole from "./SelectRole";
 import SelectProfile from "./SelectProfile";
 import Phone_number from "../common/Phone_number";
 import axios from "axios";
+import { signup } from "../utils/backend_calls_functions";
 
 function Signup() {
   // Update this URL if your dashboard shows .app instead of .dev
-  const API_URL =
-    "https://virgilio-unimpertinent-magda.ngrok-free.dev/api/add/users";
 
   const elements = [
     {
@@ -102,17 +101,7 @@ function Signup() {
 
     // Remove confirm_password and keep 'password' for the backend to hash
     const { confirm_password, ...new_form } = form;
-
-    try {
-      const response = await axios.post(API_URL, new_form, {
-        headers: { "ngrok-skip-browser-warning": "true" },
-      });
-      showSuccess(response?.data?.message || "Successfully Registered");
-      navigate("/"); // Redirect to login page on success
-    } catch (e) {
-      showError(e?.response?.data?.message || "Connection Error");
-      console.log(`Error: ${e}`);
-    }
+    await signup(new_form, navigate);
   };
 
   return (
@@ -171,6 +160,7 @@ function Signup() {
                 />
               ) : (
                 <Input
+                  auto_complete="new-password"
                   id={el.id}
                   onchange={handleInputChange}
                   placeholder={el.placeholder}

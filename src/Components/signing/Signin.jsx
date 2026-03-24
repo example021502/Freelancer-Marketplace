@@ -5,6 +5,7 @@ import Button from "../common/Button";
 import { Link, useNavigate } from "react-router-dom";
 import { showError, showSuccess } from "../utils/toastfy_notifications";
 import axios from "axios";
+import { login } from "../utils/backend_calls_functions";
 
 function Signin() {
   const elements = [
@@ -30,15 +31,7 @@ function Signin() {
     if (name === "register") return navigate("signup");
     if (form.email === "") return showError("Email is missing!");
     if (form.password === "") return showError("Password is missing!");
-    try {
-      const response = await axios.post(
-        "http://localhost:8080/api/login",
-        form,
-      );
-    } catch (e) {
-      console.log(`Error: ${e}`);
-      showError(e?.response?.message);
-    }
+    await login(form, navigate);
   };
   return (
     <div className="w-full text-sm h-dvh overflow-hidden p-4 items-center justify-center flex">
@@ -56,10 +49,13 @@ function Signin() {
         <div className="w-full flex flex-col space-y-4 items-center justify-center">
           {elements.map((el) => {
             return (
-              <div className="flex-col items-start justify-start w-full">
+              <div
+                key={el.id}
+                className="flex-col items-start justify-start w-full"
+              >
                 <Label text={el.label} class_name={"text-sm"} />
                 <Input
-                  onclick={handleInputChange}
+                  onchange={handleInputChange}
                   id={el.id}
                   placeholder={el.placeholder}
                   class_name={
@@ -78,6 +74,7 @@ function Signin() {
           ].map((btn) => {
             return (
               <Button
+                key={btn.id}
                 id={btn.id}
                 onclick={handle_button_click}
                 text={btn.label}

@@ -1,7 +1,7 @@
 import React from "react";
 
 function Label({ class_name, text }) {
-  return <label className={class_name}>{text}</label>;
+  return <p className={class_name}>{text}</p>;
 }
 
 export default Label;
