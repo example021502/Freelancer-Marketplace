@@ -8,6 +8,7 @@ import axios from "axios";
 import { login } from "../utils/backend_calls_functions";
 
 function Signin() {
+  const [loading, setLoading] = useState(false);
   const elements = [
     { label: "Email", id: "email", placeholder: "Enter your email here..." },
     {
@@ -31,6 +32,7 @@ function Signin() {
     if (name === "register") return navigate("signup");
     if (form.email === "") return showError("Email is missing!");
     if (form.password === "") return showError("Password is missing!");
+    setLoading(true);
     await login(form, navigate);
   };
   return (
@@ -78,7 +80,7 @@ function Signin() {
                 id={btn.id}
                 onclick={handle_button_click}
                 text={btn.label}
-                class_name={`w-full py-1.5 rounded-xl md:text-[1em] text-lg font-lighter items-center justify-center flex ${btn.id === "login" ? "bg-green-800 text-gray-200" : "border-green-800 border-2"}`}
+                class_name={`w-full py-1.5 rounded-xl md:text-[1em] text-lg font-lighter items-center justify-center flex ${loading ? "pointer-events-none" : ""} ${btn.id === "login" ? "bg-green-800 text-gray-200" : "border-green-800 border-2"}`}
               />
             );
           })}

@@ -19,7 +19,8 @@ export const login = async (form, navigate) => {
     localStorage.setItem("token", res?.data?.token);
     const { message } = res?.data;
     showSuccess(message);
-    navigate("/client/home");
+    sessionStorage.setItem("log", true);
+    navigate("/client");
   } catch (e) {
     console.log(`Error: ${e}`);
     const message =

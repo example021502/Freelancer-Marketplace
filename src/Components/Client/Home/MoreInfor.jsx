@@ -7,7 +7,7 @@ import ProfessionalInfor from "./ProfessionalInfor";
 import Image from "../../common/Image";
 import { getAvatar } from "../../utils/vectors";
 
-function MoreInfor({ setInfo, user }) {
+function MoreInfor({ setInfo, user, project_image }) {
   return createPortal(
     <AnimatePresence mode="wait">
       <div
@@ -20,7 +20,7 @@ function MoreInfor({ setInfo, user }) {
           transition={{ duration: 0.2, ease: "easeInOut" }}
           exit={{ width: 0 }}
           onClick={(e) => e.stopPropagation()}
-          className="w-[80%] space-y-2 sm:w-[60%] md:w-[50%] lg:w-[30%] max-h-[80%] flex flex-col items-center justify-start bg-gray-50 rounded-xl p-4"
+          className="w-[80%] space-y-2 sm:w-[60%] md:w-[50%] lg:w-[30%] max-h-full overflow-y-auto no-scrollbar flex flex-col items-center justify-start bg-gray-50 rounded-xl p-4 gap-4"
         >
           <div className="w-full relative flex flex-row items-center justify-between border-b-2 border-green-800/20">
             <Label
@@ -29,15 +29,17 @@ function MoreInfor({ setInfo, user }) {
             />
             <span
               onClick={() => setInfo(false)}
-              className="h-6 w-6 absolute border-2 border-red-800 text-lg text-red-800 cursor-pointer transition-all ease-in-out duration-150 hover:rotate-90 top-0 right-2 rounded-full flex items-center justify-center"
+              className="h-6 w-6 absolute border-2 border-red-800 text-lg text-red-800 cursor-pointer transition-all ease-in-out duration-150 hover:rotate-90 top-0 right-0 rounded-full flex items-center justify-center"
             >
               <Icon icon={"ri-close-line"} />
             </span>
           </div>
           <Image
+            image={project_image}
             avatar={getAvatar(user.name)}
-            image={user?.["profile_picture"]}
-            class_name={"w-full h-36 border border-gray-300 rounded-xl"}
+            class_name={
+              "w-full h-36 border object-contain border-gray-300 rounded-xl"
+            }
           />
           <ProfessionalInfor user={user} />
         </motion.div>

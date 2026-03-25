@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Label from "../../common/Label";
 import Icon from "../../common/Icon";
-import { useNavigate } from "react-router-dom";
-import Image from "../../common/Image";
+import { useNavigate, useLocation } from "react-router-dom";
 import Logo from "../../common/Logo";
+import { motion, AnimatePresence } from "framer-motion";
+import LogoutComponent from "./LogoutComponent";
 
 function NavBar() {
   const navigate = useNavigate();
@@ -20,9 +21,32 @@ function NavBar() {
     { label: "Settings", id: "settings", icon: "ri-settings-4-line" },
     { label: "Logout", id: "logout", icon: "ri-logout-box-line" },
   ];
+  const [navbutton, setNavbutton] = useState("home");
+  const [logout, setLogout] = useState(false);
+
+  const { pathname } = useLocation();
+  useEffect(() => {
+    const section = pathname.split("/").at(-1);
+    if (section === "client") setNavbutton("home");
+    else setNavbutton(section);
+  }, [pathname]);
 
   const handleNavigation = (id) => {
-    navigate();
+    if (id === "logout") return setLogout(true);
+    if (id === "home") return navigate("/client");
+    navigate(`/client/${id}`);
+  };
+
+  const handleConfirming = (name) => {
+    if (name === "Cancel") {
+      setLogout(false);
+      navigate("/client");
+      return;
+    }
+    setTimeout(() => {
+      sessionStorage.clear();
+      navigate("/");
+    }, 1000);
   };
 
   return (
@@ -31,17 +55,19 @@ function NavBar() {
         <Logo />
       </div>
       {buttons.map((btn) => {
+        const isSelected = btn.id === navbutton;
         return (
           <div
             key={btn.id}
-            onClick={handleNavigation}
-            className={`flex flex-row py-2.5 px-4 hover:bg-green-800/10 rounded-xl bg-gray-100 w-full items-center justify-start space-x-2 cursor-pointer transition-all ease-in0out duration-150 hover:scale-[1.02] ${btn.id === "logout" ? "mt-auto" : ""}`}
+            onClick={() => handleNavigation(btn.id)}
+            className={`flex flex-row py-2.5 px-4 hover:bg-green-800/10 rounded-xl bg-gray-100 w-full items-center justify-start space-x-2 cursor-pointer transition-all ease-in0out duration-150 hover:scale-[1.02] ${isSelected ? "border-l-4 border-green-800" : ""} ${btn.id === "logout" ? "mt-auto" : ""}`}
           >
             <Icon icon={btn.icon} />
             <Label text={btn.label} />
           </div>
         );
       })}
+      {logout && <LogoutComponent onConfirm={handleConfirming} />}
     </div>
   );
 }

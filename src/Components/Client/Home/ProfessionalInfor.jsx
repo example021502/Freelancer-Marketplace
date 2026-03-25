@@ -1,7 +1,11 @@
 import React from "react";
 import Label from "../../common/Label";
+import Button from "../../common/Button";
+import { useNavigate } from "react-router-dom";
 
 function ProfessionalInfor({ user }) {
+  const navigate = useNavigate();
+
   const infor = [
     { label: "Specialty: ", id: "specialty", value: user?.specialty },
     {
@@ -18,7 +22,7 @@ function ProfessionalInfor({ user }) {
     { label: "Email: ", id: "email", value: user?.email },
     { label: "Contact: ", id: "contact", value: user?.["mobile_number"] },
     { label: "Availability: ", id: "availability", value: user?.availability },
-    { label: "Rating: ", id: "rate", value: user?.rating },
+    { label: "Rating: ", id: "rate", value: `${user?.rating} / 5` },
   ];
 
   const handleClicking = (id, value) => {
@@ -34,6 +38,10 @@ function ProfessionalInfor({ user }) {
     const phoneLink = `tel:${value}`;
     window.location.href = phoneLink;
     return;
+  };
+
+  const handleMessaging = () => {
+    navigate("/client/messages");
   };
 
   return (
@@ -80,15 +88,25 @@ function ProfessionalInfor({ user }) {
                 key={info.id}
                 className="w-full flex flex-row items-center justify-start"
               >
-                <Label text={info.label} class_name={"truncate p-0.5"} />
+                <Label text={info.label} class_name={"p-0.5"} />
                 <Label
                   text={value}
-                  class_name={`truncate p-0.5 ${isClickable ? `${after_styles}` : ""}`}
+                  class_name={`truncate p-0.5 font-semibold ${isClickable ? `${after_styles}` : ""}`}
                 />
               </div>
             );
           })}
         </div>
+      </div>
+      <div className="w-full flex items-center justify-center">
+        <Button
+          onclick={handleMessaging}
+          text={"Message"}
+          id={"messages"}
+          class_name={
+            "w-full py-1 font-semibold border-2 border-green-800 text-green-800 rounded-lg tracking-wide"
+          }
+        />
       </div>
     </div>
   );

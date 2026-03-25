@@ -4,7 +4,7 @@ import { lorelei } from "@dicebear/collection";
 import { createAvatar } from "@dicebear/core";
 
 export const getAvatar = (name) => {
-  return createAvatar(initials, {
+  return createAvatar(lorelei, {
     seed: name,
     radius: 5,
     backgroundColor: "b6e3f4",

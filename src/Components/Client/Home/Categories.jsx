@@ -44,7 +44,7 @@ function Categories() {
           "font-lighter border-b-2 border-green-800/20 w-full mb-2 text-lg"
         }
       />
-      <div className="w-full text-sm flex-wrap font-lighter bg-gray-200 rounded-xl p-2 flex flex-row items-center justify-start gap-2">
+      <div className="w-full text-sm flex-wrap font-lighter rounded-xl flex flex-row items-center justify-start gap-2">
         {categories.map((cart) => {
           return (
             <div
