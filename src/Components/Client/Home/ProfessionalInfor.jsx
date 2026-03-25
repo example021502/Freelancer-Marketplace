@@ -22,8 +22,18 @@ function ProfessionalInfor({ user }) {
   ];
 
   const handleClicking = (id, value) => {
-    if (id === "email") return handleSendingEmail(value);
-    return handleCalling(value);
+    if (id === "email") {
+      const subject = "Freelancer Marketplace: Connection Request";
+      const message =
+        "Hello, I am interested in your services. I have a job to be done. May we connect and discuss how we can work together.";
+      const maltoLink = `mailto:${value}?subject=${encodeURIComponent(subject)}&body${encodeURIComponent(message)}`;
+      window.location.href = maltoLink;
+      return;
+    }
+
+    const phoneLink = `tel:${value}`;
+    window.location.href = phoneLink;
+    return;
   };
 
   return (
@@ -37,7 +47,9 @@ function ProfessionalInfor({ user }) {
         />
         <Label
           text={user.bio}
-          class_name={"w-full bg-green-800/15 p-2 rounded-xl"}
+          class_name={
+            "w-full bg-green-800/15 text-xs tracking-wide p-2 rounded-xl"
+          }
         />
       </div>
 

@@ -37,7 +37,7 @@ function MoreInfor({ setInfo, user }) {
           <Image
             avatar={getAvatar(user.name)}
             image={user?.["profile_picture"]}
-            class_name={"w-full h-40 rounded-xl"}
+            class_name={"w-full h-36 border border-gray-300 rounded-xl"}
           />
           <ProfessionalInfor user={user} />
         </motion.div>

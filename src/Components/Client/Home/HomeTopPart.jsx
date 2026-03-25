@@ -9,6 +9,7 @@ function HomeTopPart() {
   const get_data = async () => {
     const data = await get_user_data();
     setUser(data);
+    sessionStorage.setItem("logged_user_email", data.email);
   };
 
   useEffect(() => {
