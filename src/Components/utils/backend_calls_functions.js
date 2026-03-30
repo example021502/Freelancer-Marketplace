@@ -55,6 +55,7 @@ export const get_user_data = async () => {
   }
 };
 
+// getting a selected freelancer data
 export const getUser = async (table, id, fields = [], target_field = "") => {
   try {
     const clean_fields = fields.length > 0 ? fields.join(",") : "";
@@ -70,6 +71,18 @@ export const getUser = async (table, id, fields = [], target_field = "") => {
     showError(
       e?.response?.data?.message || "Could not load the user for this post!",
     );
+    return null;
+  }
+};
+
+// get logged user assigned projects jobs
+export const get_user_projects = async (email) => {
+  try {
+    const res = await api.get(`/get/user_projects/${email}`);
+    return res?.data;
+  } catch (e) {
+    console.log(`Error: ${e}`);
+    showError(e?.response?.data?.message || "Could not load the projects");
     return null;
   }
 };

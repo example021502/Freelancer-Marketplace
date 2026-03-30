@@ -35,13 +35,15 @@ app.use("/api", commonRoutes);
 // Server Start
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
-  console.log("Available endpoints:");
   console.log("  POST /api/add/users - User registration");
   console.log("  POST /api/login - User login");
   console.log("  GET  /api/userData - Get user data (protected)");
   console.log("  GET  /api/get/users - Get all users");
   console.log("  GET  /api/get/projects - Get all projects");
   console.log("  GET  /api/get/:table/:id - Get specific data from any table");
+  console.log(
+    "GET /api/get/user_projects/:email -Get logged user projects information",
+  );
 });
 
 module.exports = app;

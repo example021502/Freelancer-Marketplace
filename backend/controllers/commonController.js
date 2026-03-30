@@ -5,6 +5,9 @@ const { get_table } = require("../get_table_config");
 const getSpecificData = async (req, res) => {
   const { table, id } = req.params;
   const { fields, targetField } = req.query;
+  if (!targetField) {
+    return res.status(400).json({ message: "Missing targetField parameter" });
+  }
   const requestedFields = fields ? fields.split(",") : [];
   const table_config = get_table(table);
 

@@ -1,6 +1,6 @@
 import React from "react";
 import Label from "../../common/Label";
-
+import { motion, AnimatePresence } from "framer-motion";
 function Categories() {
   const categories = [
     {
@@ -37,26 +37,31 @@ function Categories() {
     },
   ];
   return (
-    <div className="w-full text-sm flex flex-col items-start justify-start">
-      <Label
-        text={"Categories"}
-        class_name={
-          "font-lighter border-b-2 border-green-800/20 w-full mb-2 text-lg"
-        }
-      />
-      <div className="w-full text-sm flex-wrap font-lighter rounded-xl flex flex-row items-center justify-start gap-2">
-        {categories.map((cart) => {
-          return (
-            <div
-              key={cart.id}
-              className="py-2 px-3 ronded-xl hover:bg-gray-50 border border-green-800/40 cursor-pointer transition-all duration-150 ease-in-out hover:scale-[1.02] rounded-xl flex flex-row items-center justify-start space-x-2"
-            >
-              <Label text={cart.label} class_name={"pointer-events-none"} />
-            </div>
-          );
-        })}
-      </div>
-    </div>
+    <AnimatePresence mode="wait">
+      <motion.div
+        exit={{ opacity: 0, y: 10 }}
+        className="w-full text-sm flex flex-col items-start justify-start"
+      >
+        <Label
+          text={"Categories"}
+          class_name={
+            "font-lighter border-b-2 border-green-800/20 w-full mb-2 text-lg"
+          }
+        />
+        <div className="w-full text-sm flex-wrap font-lighter rounded-xl flex flex-row items-center justify-start gap-2">
+          {categories.map((cart) => {
+            return (
+              <div
+                key={cart.id}
+                className="py-2 px-3 ronded-xl hover:bg-gray-50 border border-green-800/40 cursor-pointer transition-all duration-150 ease-in-out hover:scale-[1.02] rounded-xl flex flex-row items-center justify-start space-x-2"
+              >
+                <Label text={cart.label} class_name={"pointer-events-none"} />
+              </div>
+            );
+          })}
+        </div>
+      </motion.div>
+    </AnimatePresence>
   );
 }
 

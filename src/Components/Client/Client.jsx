@@ -8,7 +8,7 @@ function Client() {
       <div className="p-2 rounded-xl items-center justify-start h-full bg-gray-200 flex flex-col space-y-2">
         <NavBar />
       </div>
-      <main className="flex-1 p-2 rounded-xl">
+      <main className="flex-1 rounded-xl">
         <Outlet />
       </main>
     </div>

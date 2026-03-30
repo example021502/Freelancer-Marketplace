@@ -1,8 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const pool = require("../config/db");
-const transporter = require("nodemailer");
-const { text } = require("body-parser");
 
 const jwt_secret = "my_super_secret_key_021502";
 
@@ -105,6 +103,7 @@ const getUserData = (req, res) => {
   });
 };
 
+// Sending an OTP to email: -> no yet implemented
 const sendOTPEmail = (req, res) => {
   const { email, to_email, from_email, from_password } = req.body;
   if (!email) return res.status(400).json({ message: "Missing email!" });

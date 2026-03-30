@@ -34,6 +34,7 @@ function LogoutComponent({ onConfirm }) {
                   : "ri-checkbox-circle-line";
               return (
                 <div
+                  key={btn}
                   onClick={() => onConfirm(btn)}
                   className={`w-full cursor-pointer transition-all duration-150 ease-in-out hover:scale-[1.02] flex flex-row items-center justify-center gap-2 px-2 rounded-xl ${btn === "Cancel" ? "border-2 border-red-800 text-red-800" : "bg-green-800 text-gray-100 py-0.5"}`}
                 >

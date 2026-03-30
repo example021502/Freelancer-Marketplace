@@ -61,14 +61,14 @@ function MainDisplay() {
     );
   }
   return (
-    <div className="w-full flex items-start justify-start gap-2 flex-col">
+    <div className="w-full z-10 flex items-start justify-start gap-2 flex-col">
       <div
         className={"w-full gap-2 border-b-2 flex flex-row border-green-800/20"}
       >
         {["All", "Recent"].map((btn) => {
           const isSelected = btn === section_selected;
           return (
-            <div onClick={() => handleSelectingSection(btn)}>
+            <div key={btn} onClick={() => handleSelectingSection(btn)}>
               <Label
                 key={btn}
                 text={btn}
