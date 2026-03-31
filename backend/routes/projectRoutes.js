@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const { getAllProjects } = require("../controllers/projectController");
-const userProjects = require("../controllers/getUserProjects");
+const {
+  getAllProjects,
+  getUserProjects,
+} = require("../controllers/projectController");
 
 // Fetching all projects Route
 router.get("/get/projects", getAllProjects);
-router.get("/get/user_projects/:email", userProjects);
+router.get("/get/user_projects", getUserProjects);
 
 module.exports = router;

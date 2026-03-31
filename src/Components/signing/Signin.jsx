@@ -33,7 +33,7 @@ function Signin() {
     if (form.email === "") return showError("Email is missing!");
     if (form.password === "") return showError("Password is missing!");
     setLoading(true);
-    await login(form, navigate);
+    await login(form, navigate, setLoading);
   };
   return (
     <div className="w-full text-sm h-dvh overflow-hidden p-4 items-center justify-center flex">

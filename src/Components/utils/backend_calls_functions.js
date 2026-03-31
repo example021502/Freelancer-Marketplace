@@ -8,12 +8,14 @@ export const get_projects = async () => {
     return res.data;
   } catch (e) {
     console.log(`Error: ${e}`);
-    return showError("Something went wrong!");
+    return showError(
+      e?.response?.data?.message || "Could not load the projects!",
+    );
   }
 };
 
 // login in
-export const login = async (form, navigate) => {
+export const login = async (form, navigate, setLoading) => {
   try {
     const res = await api.post("/login", form);
     localStorage.setItem("token", res?.data?.token);
@@ -22,9 +24,10 @@ export const login = async (form, navigate) => {
     sessionStorage.setItem("log", true);
     navigate("/client");
   } catch (e) {
+    setLoading(false);
     console.log(`Error: ${e}`);
     const message =
-      e?.res?.data?.message || `Error: Something went wrong! ${e}`;
+      e?.response?.data?.message || `Error: Something went wrong! ${e}`;
     showError(message);
   }
 };
@@ -37,7 +40,7 @@ export const signup = async (new_form, navigate) => {
     showSuccess(message);
     navigate("/");
   } catch (e) {
-    const message = e?.res?.data?.message;
+    const message = e?.response?.data?.message;
     console.log(`Error: ${e}`);
     return showError(message);
   }
@@ -50,12 +53,17 @@ export const get_user_data = async () => {
     return res?.data?.user;
   } catch (e) {
     console.log(`Error: ${e}`);
-    showError(e?.response?.data?.message || "Could not load the user data!");
-    return null;
+    return showError(
+      e?.response?.data?.message || "Could not load the user data!",
+    );
   }
 };
 
+<<<<<<< Updated upstream
 // getting a selected freelancer data
+=======
+// get user by id and table name
+>>>>>>> Stashed changes
 export const getUser = async (table, id, fields = [], target_field = "") => {
   try {
     const clean_fields = fields.length > 0 ? fields.join(",") : "";
@@ -75,6 +83,7 @@ export const getUser = async (table, id, fields = [], target_field = "") => {
   }
 };
 
+<<<<<<< Updated upstream
 // get logged user assigned projects jobs
 export const get_user_projects = async (email) => {
   try {
@@ -83,6 +92,22 @@ export const get_user_projects = async (email) => {
   } catch (e) {
     console.log(`Error: ${e}`);
     showError(e?.response?.data?.message || "Could not load the projects");
+=======
+export const get_all_projects_by_email_and_role = async (email, role) => {
+  try {
+    const res = await api.get(
+      `/get/user_projects?email=${encodeURIComponent(email)}&role=${encodeURIComponent(role)}`,
+    );
+    const status = res?.data?.status;
+    if (status === 500) return showError(res?.data?.message);
+    return res?.data?.result;
+  } catch (e) {
+    console.log(`Error: ${e}`);
+    showError(
+      e?.response?.data?.message ||
+        "Could not load the projects for this user!",
+    );
+>>>>>>> Stashed changes
     return null;
   }
 };
