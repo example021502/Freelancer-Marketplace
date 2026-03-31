@@ -26,7 +26,7 @@ function AssignedProjects() {
   return (
     <div className="w-full flex flex-col items-center justify-start ">
       <HomeTopPart />
-      <div className=""></div>
+      {tokenData?.email || "Email not available"}
     </div>
   );
 }

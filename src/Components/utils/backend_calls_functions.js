@@ -59,11 +59,7 @@ export const get_user_data = async () => {
   }
 };
 
-<<<<<<< Updated upstream
-// getting a selected freelancer data
-=======
 // get user by id and table name
->>>>>>> Stashed changes
 export const getUser = async (table, id, fields = [], target_field = "") => {
   try {
     const clean_fields = fields.length > 0 ? fields.join(",") : "";
@@ -83,16 +79,6 @@ export const getUser = async (table, id, fields = [], target_field = "") => {
   }
 };
 
-<<<<<<< Updated upstream
-// get logged user assigned projects jobs
-export const get_user_projects = async (email) => {
-  try {
-    const res = await api.get(`/get/user_projects/${email}`);
-    return res?.data;
-  } catch (e) {
-    console.log(`Error: ${e}`);
-    showError(e?.response?.data?.message || "Could not load the projects");
-=======
 export const get_all_projects_by_email_and_role = async (email, role) => {
   try {
     const res = await api.get(
@@ -107,7 +93,6 @@ export const get_all_projects_by_email_and_role = async (email, role) => {
       e?.response?.data?.message ||
         "Could not load the projects for this user!",
     );
->>>>>>> Stashed changes
     return null;
   }
 };
