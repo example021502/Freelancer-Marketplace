@@ -24,6 +24,6 @@ export const getIcon = (name) => {
   return createAvatar(icons, {
     seed: name,
     radius: 50,
-    backgroundColor: "b6e3f4",
+    backgroundColor: ["b6e3f4", "c342e3", "d4a5a5"],
   }).toDataUri();
 };

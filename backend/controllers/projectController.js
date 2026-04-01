@@ -19,48 +19,32 @@ const getUserProjects = async (req, res) => {
   const { email, role } = req.query;
 
   try {
-    // Get user_id from email and role
-    const [userRows] = await pool.query(
-      "SELECT user_id FROM users WHERE email=? AND role=?",
-      [email, role],
-    );
-
-    if (!userRows || userRows.length === 0)
-      return res.status(404).json({ message: "User not found!" });
-
-    const user_id = userRows[0].user_id;
-
-    // Get all projects for this user
-    const [projects] = await pool.query(
-      "SELECT * FROM projects WHERE user_id=?",
-      [user_id],
-    );
-
-    if (!projects || projects.length === 0)
-      return res.status(404).json({ message: "No Projects found!" });
-
-    // Get related images, ratings, and payments in parallel
-    const [imagesResult, ratingsResult, paymentsResult] = await Promise.all([
+    // Get related projects, images, ratings, and payments in parallel
+    const [projects, images, ratings, payments] = await Promise.all([
       pool.query(
-        "SELECT p.project_id, p.user_id, i.image_id, i.alt_text, i.image_url FROM projects p LEFT JOIN images i ON p.project_id = i.project_id WHERE p.user_id = ?",
-        [user_id],
+        "SELECT u.user_id, p.project_id, p.freelancer_id, p.title, p.description, p.budget_min, p.budget_max, p.project_type, p.project_status, p.deadline, p.date_completed, p.visibility FROM users u LEFT JOIN projects p ON u.user_id = p.user_id WHERE u.email = ? AND u.role = ?",
+        [email, role],
       ),
       pool.query(
-        "SELECT p.project_id, p.user_id, r.rate_id, r.freelancer_id, r.reviewer_id, r.reviwee_id, r.rating, r.rating_comment, r.created_at FROM projects p LEFT JOIN ratings r ON p.project_id = r.project_id WHERE p.user_id = ?",
-        [user_id],
+        "SELECT u.user_id, p.project_id, i.image_id, i.alt_text, i.image_url FROM users u LEFT JOIN projects p ON u.user_id = p.user_id LEFT JOIN images i ON p.project_id = i.project_id WHERE u.email = ? AND u.role = ?",
+        [email, role],
       ),
       pool.query(
-        "SELECT p.project_id, p.user_id, b.payment_id, b.freelancer_id, b.amount, b.payment_status, b.payment_method, b.created_at FROM projects p LEFT JOIN payments b ON p.project_id = b.project_id WHERE p.user_id = ?",
-        [user_id],
+        "SELECT u.user_id, p.project_id, r.rate_id, r.freelancer_id, r.reviewer_id, r.reviwee_id, r.rating, r.rating_comment, r.created_at FROM users u LEFT JOIN projects p ON u.user_id = p.user_id LEFT JOIN ratings r ON p.project_id = r.project_id WHERE u.email = ? AND u.role = ?",
+        [email, role],
+      ),
+      pool.query(
+        "SELECT u.user_id, p.project_id, p.user_id, b.payment_id, b.freelancer_id, b.amount, b.payment_status, b.payment_method, b.created_at FROM users u LEFT JOIN projects p ON u.user_id = p.user_id LEFT JOIN payments b ON p.project_id = b.project_id WHERE u.email = ? AND u.role = ?",
+        [email, role],
       ),
     ]);
 
     return res.status(200).json({
       result: {
-        projects: projects,
-        images: imagesResult[0],
-        ratings: ratingsResult[0],
-        payments: paymentsResult[0],
+        projects: projects[0],
+        images: images[0],
+        ratings: ratings[0],
+        payments: payments[0],
       },
     });
   } catch (error) {

@@ -55,42 +55,44 @@ const registerUser = async (req, res) => {
 
 // User Login Controller
 const loginUser = async (req, res) => {
+  if (!req.body.email || !req.body.password) {
+    return res.status(400).json({ message: "Email and password are required" });
+  }
   const { email, password } = req.body;
 
   // Look for the hashed password in the 'password_hash' column
   const sql = "SELECT name, role, password_hash FROM users WHERE email = ?";
 
-  pool.query(sql, [email], async (error, result) => {
-    if (error) return res.status(500).json({ message: "Database error" });
-    if (result.length === 0)
+  try {
+    const [rows] = await pool.query(sql, [email]);
+    if (rows.length === 0)
       return res.status(404).json({ message: "User not found" });
 
     // Compare plain-text password with the stored hash
-    const user = result[0];
-    try {
-      const isValid = await bcrypt.compare(password, user.password_hash);
-      if (!isValid) {
-        return res.status(401).json({ message: "Incorrect password" });
-      }
-
-      const token = jwt.sign(
-        {
-          name: user.name,
-          email: email,
-          role: user.role,
-        },
-        jwt_secret,
-        { expiresIn: "24h" },
-      );
-
-      res.status(200).json({
-        message: "Welcome back!",
-        token: token,
-      });
-    } catch (e) {
-      return res.json({ message: "Error processing login" });
+    const user = rows[0];
+    const isValid = await bcrypt.compare(password, user.password_hash);
+    if (!isValid) {
+      return res.status(401).json({ message: "Incorrect password" });
     }
-  });
+
+    const token = jwt.sign(
+      {
+        name: user.name,
+        email: email,
+        role: user.role,
+      },
+      jwt_secret,
+      { expiresIn: "24h" },
+    );
+
+    res.status(200).json({
+      message: "Welcome back!",
+      token: token,
+    });
+  } catch (e) {
+    console.log(`Error: ${e}`);
+    return res.status(500).json({ message: "Database error" });
+  }
 };
 
 // Get User Data from Token Controller

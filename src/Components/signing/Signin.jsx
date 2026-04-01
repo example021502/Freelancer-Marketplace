@@ -35,6 +35,7 @@ function Signin() {
     setLoading(true);
     await login(form, navigate, setLoading);
   };
+
   return (
     <div className="w-full text-sm h-dvh overflow-hidden p-4 items-center justify-center flex">
       <div className="w-full h-[80%] md:w-[40%] lg:w-[38%] flex items-center p-6 justify-center flex-col rounded-2xl  md:shadow-md space-y-6 md:border border-gray-300">
@@ -79,7 +80,13 @@ function Signin() {
                 key={btn.id}
                 id={btn.id}
                 onclick={handle_button_click}
-                text={btn.label}
+                text={
+                  btn.id === "login"
+                    ? loading
+                      ? "Logging..."
+                      : btn.label
+                    : btn.label
+                }
                 class_name={`w-full py-1.5 rounded-xl md:text-[1em] text-lg font-lighter items-center justify-center flex ${loading ? "pointer-events-none" : ""} ${btn.id === "login" ? "bg-green-800 text-gray-200" : "border-green-800 border-2"}`}
               />
             );

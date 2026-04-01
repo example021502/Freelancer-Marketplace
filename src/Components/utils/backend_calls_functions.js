@@ -23,6 +23,7 @@ export const login = async (form, navigate, setLoading) => {
     showSuccess(message);
     sessionStorage.setItem("log", true);
     navigate("/client");
+    setLoading(false);
   } catch (e) {
     setLoading(false);
     console.log(`Error: ${e}`);
@@ -79,13 +80,12 @@ export const getUser = async (table, id, fields = [], target_field = "") => {
   }
 };
 
+// get projects by email and role
 export const get_all_projects_by_email_and_role = async (email, role) => {
   try {
     const res = await api.get(
       `/get/user_projects?email=${encodeURIComponent(email)}&role=${encodeURIComponent(role)}`,
     );
-    const status = res?.data?.status;
-    if (status === 500) return showError(res?.data?.message);
     return res?.data?.result;
   } catch (e) {
     console.log(`Error: ${e}`);
