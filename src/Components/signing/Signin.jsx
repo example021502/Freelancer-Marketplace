@@ -4,8 +4,9 @@ import Input from "../common/Input";
 import Button from "../common/Button";
 import { Link, useNavigate } from "react-router-dom";
 import { showError, showSuccess } from "../utils/toastfy_notifications";
-import axios from "axios";
 import { login } from "../utils/backend_calls_functions";
+import Image from "../common/Image";
+import { getAvatar } from "../utils/vectors";
 
 function Signin() {
   const [loading, setLoading] = useState(false);
@@ -37,7 +38,17 @@ function Signin() {
   };
 
   return (
-    <div className="w-full text-sm h-dvh overflow-hidden p-4 items-center justify-center flex">
+    <div className="w-full text-sm relative h-dvh overflow-hidden p-4 items-center justify-center flex">
+      <div className="flex border-b border-gray-400 pb-2 border-dashed absolute tracking-wider top-4 md:left-4 mx-auto flex-col items-start justify-start">
+        <Label
+          text={"Freelancer Marketplace"}
+          class_name={"font-bold text-xl"}
+        />
+        <Label
+          text={"You've got the Talent! We've got the stage!"}
+          class_name={"text-xs"}
+        />
+      </div>
       <div className="w-full h-[80%] md:w-[40%] lg:w-[38%] flex items-center p-6 justify-center flex-col rounded-2xl  md:shadow-md space-y-6 md:border border-gray-300">
         <header className="w-full flex flex-col items-center justify-center">
           <Label

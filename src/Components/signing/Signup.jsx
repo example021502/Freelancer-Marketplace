@@ -7,25 +7,28 @@ import Label from "../common/Label";
 import Input from "../common/Input";
 import Button from "../common/Button";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  showError,
-  showSuccess,
-  showWarning,
-} from "../utils/toastfy_notifications";
+import { showError, showWarning } from "../utils/toastfy_notifications";
 import SelectRole from "./SelectRole";
 import SelectProfile from "./SelectProfile";
 import Phone_number from "../common/Phone_number";
-import axios from "axios";
 import { signup } from "../utils/backend_calls_functions";
+import Textarea from "../common/Textarea";
 
 function Signup() {
   // Update this URL if your dashboard shows .app instead of .dev
 
+  // signup elements
   const elements = [
     {
-      label: "Full Name",
-      id: "name",
-      placeholder: "Enter your full name here...",
+      label: "First Name",
+      id: "first_name",
+      placeholder: "Enter your first name here...",
+      type: "text",
+    },
+    {
+      label: "Last Name",
+      id: "last_name",
+      placeholder: "Enter your last name here...",
       type: "text",
     },
     {
@@ -65,13 +68,20 @@ function Signup() {
       placeholder: "Confirm password...",
       type: "password",
     },
+    {
+      label: "About (optional)",
+      id: "bio",
+      placeholder: "Tell us about yourself...",
+      type: "textarea",
+    },
   ];
 
   const navigate = useNavigate();
   const [expand, setExpand] = useState(false);
 
   const [form, setForm] = useState({
-    name: "",
+    first_name: "",
+    last_name: "",
     email: "",
     role: "",
     mobile_number: "",
@@ -82,7 +92,8 @@ function Signup() {
   });
 
   const handleInputChange = (value, id) => {
-    setForm((prev) => ({ ...prev, [id]: value }));
+    const val = id === "role" ? value.toLocaleLowerCase() : value;
+    setForm((prev) => ({ ...prev, [id]: val }));
   };
 
   const handle_button_click = async (name) => {
@@ -103,6 +114,10 @@ function Signup() {
     const { confirm_password, ...new_form } = form;
     await signup(new_form, navigate);
   };
+
+  // input styles
+  const input_styles =
+    "w-full cursor-pointer p-3 md:p-2 mt-1 focus:outline-none focus:ring ring-green-800 rounded-xl border border-gray-400";
 
   return (
     <div className="w-full text-sm h-dvh overflow-hidden p-4 items-center justify-center flex">
@@ -146,9 +161,7 @@ function Signup() {
                     read_only={true}
                     id={el.id}
                     placeholder={el.placeholder}
-                    class_name={
-                      "w-full cursor-pointer p-3 md:p-2 focus:outline-none focus:ring ring-green-800 rounded-xl border border-gray-400"
-                    }
+                    class_name={input_styles}
                     type={"text"}
                   />
                 </div>
@@ -158,15 +171,20 @@ function Signup() {
                   default_value={form.mobile_number}
                   require={true}
                 />
+              ) : el.type === "textarea" ? (
+                <Textarea
+                  id={el.id}
+                  handleInputChange={handleInputChange}
+                  class_name={input_styles}
+                  placeholder={el.placeholder}
+                />
               ) : (
                 <Input
                   auto_complete="new-password"
                   id={el.id}
                   onchange={handleInputChange}
                   placeholder={el.placeholder}
-                  class_name={
-                    "w-full p-3 md:p-2 focus:outline-none focus:ring ring-green-800 rounded-xl border border-gray-400"
-                  }
+                  class_name={input_styles}
                   type={el.type}
                 />
               )}

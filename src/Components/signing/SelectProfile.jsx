@@ -7,8 +7,8 @@ import Button from "../common/Button";
 function SelectProfile({ handleInputChange, el, setClose }) {
   const [link, setLink] = useState("");
 
-  const handlePasting = async () => {
-    const value = await navigator.clipboard.readText();
+  const handlePasting = async (e) => {
+    const value = await e.clipboardData.getData("text");
     setLink(value);
   };
 
@@ -56,13 +56,9 @@ function SelectProfile({ handleInputChange, el, setClose }) {
             "w-full cursor-pointer p-3 cursor md:p-2 focus:outline-none focus:ring ring-green-800 rounded-xl border border-gray-400"
           }
           type={"text"}
+          onpaste={handlePasting}
         />
-        <span
-          onClick={handlePasting}
-          className="absolute rounded-full border-gray-400 shadow-sm text-green-800 h-10 w-10  top-4 border right-4 md:text-[1.6em] text-[1.4em] font-lighter cursor-pointer flex items-center justify-center hover:scale-[1.05] transition-all ease-in-out duration-150"
-        >
-          <Icon icon={"ri-clipboard-line"} />
-        </span>
+
         <div className=" w-full flex items-center justify-center gap-4 flex-row">
           <Button
             onclick={() => handleAddingLink()}

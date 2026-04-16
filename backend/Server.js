@@ -18,6 +18,8 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const projectRoutes = require("./routes/projectRoutes");
 const commonRoutes = require("./routes/commonRoutes");
+const paymentsRoutes = require("./routes/paymentRoutes");
+const postsRoutes = require("./routes/postsRoutes");
 
 const app = express();
 const port = 8080;
@@ -31,9 +33,11 @@ app.use("/api", authRoutes);
 app.use("/api", userRoutes);
 app.use("/api", projectRoutes);
 app.use("/api", commonRoutes);
+app.use("/api", paymentsRoutes);
+app.use("/api", postsRoutes);
 
 // Server Start
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
   console.log(`Server running on port ${port}`);
   console.log("  POST /api/add/users - User registration");
   console.log("  POST /api/login - User login");

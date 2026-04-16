@@ -1,10 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Label from "../../common/Label";
 import Button from "../../common/Button";
 import { useNavigate } from "react-router-dom";
+import { get_information_common } from "../../utils/backend_calls_functions";
 
-function ProfessionalInfor({ user }) {
+function ProfessionalInfor({ user, personal_info }) {
   const navigate = useNavigate();
+  const [ratingData, setRatingData] = useState(null);
+  const getRating = async () => {
+    const data = await get_information_common(
+      "ratings",
+      "freelancer_id",
+      user.freelancer_id,
+    );
+    setRatingData(data);
+  };
+
+  useEffect(() => {
+    getRating();
+  }, []);
 
   const infor = [
     { label: "Specialty: ", id: "specialty", value: user?.specialty },
@@ -18,11 +32,23 @@ function ProfessionalInfor({ user }) {
       id: "experience",
       value: `${user?.experience_years} years`,
     },
-    { label: "Country: ", id: "country", value: user?.country },
-    { label: "Email: ", id: "email", value: user?.email },
-    { label: "Contact: ", id: "contact", value: user?.["mobile_number"] },
-    { label: "Availability: ", id: "availability", value: user?.availability },
-    { label: "Rating: ", id: "rate", value: `${user?.rating} / 5` },
+    {
+      label: "Country: ",
+      id: "country",
+      value: personal_info?.country || "N/A",
+    },
+    { label: "Email: ", id: "email", value: personal_info?.email || "N/A" },
+    {
+      label: "Contact: ",
+      id: "contact",
+      value: personal_info?.["mobile_number"] || "N/A",
+    },
+    {
+      label: "Availability: ",
+      id: "availability",
+      value: user?.availability || "N/A",
+    },
+    { label: "Rating: ", id: "rate", value: `${ratingData?.rating} / 5` },
   ];
 
   const handleClicking = (id, value) => {
@@ -86,7 +112,7 @@ function ProfessionalInfor({ user }) {
                   isClickable ? handleClicking(info.id, info.value) : null
                 }
                 key={info.id}
-                className="w-full flex flex-row items-center justify-start"
+                className="w-full flex flex-row flex-wrap items-center justify-start"
               >
                 <Label text={info.label} class_name={"p-0.5"} />
                 <Label

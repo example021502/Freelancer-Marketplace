@@ -1,13 +1,15 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const pool = require("../config/db");
-
 const jwt_secret = "my_super_secret_key_021502";
+const v4 = require("uuid").v4;
 
 // User Registration Controller
 const registerUser = async (req, res) => {
   const {
-    name,
+    first_name,
+    last_name,
+    bio,
     email,
     role,
     mobile_number,
@@ -17,33 +19,120 @@ const registerUser = async (req, res) => {
   } = req.body;
 
   try {
-    // 1. Check if email is already taken
-    const [exist] = await pool
-      .promise()
-      .query("SELECT email FROM users WHERE email = ?", [email]);
-    if (exist.length > 0) {
-      return res.status(409).json({ message: "Email already exists" });
+    const user_id = v4();
+
+    // Check email based on role and insert into appropriate table
+    if (role === "client") {
+      const [exist] = await pool.query(
+        "SELECT email FROM clients WHERE email = ?",
+        [email],
+      );
+      if (exist.length > 0) {
+        return res.status(409).json({ message: "Email already exists" });
+      }
     }
+    if (role === "freelancer") {
+      const [exist] = await pool.query(
+        "SELECT email FROM freelancers WHERE email = ?",
+        [email],
+      );
+      if (exist.length > 0) {
+        return res.status(409).json({ message: "Email already exists" });
+      }
+    } else if (role === "admin") {
+      const [exist] = await pool.query(
+        "SELECT email FROM admins WHERE email = ?",
+        [email],
+      );
+      if (exist.length > 0) {
+        return res.status(409).json({ message: "Email already exists" });
+      }
+    }
+    if (role !== "client" && role !== "freelancer" && role !== "admin")
+      return res.status(400).json({ message: "Invalid role" });
 
-    // 2. Hash the incoming plain-text password
-    const hash = await bcrypt.hash(password, 10);
+    if (role === "client") {
+      await pool.query(
+        "INSERT INTO clients(client_id, first_name, last_name, bio, email, mobile_number, country, profile_picture, create_at) VALUES(?,?,?,?,?,?,?,?,NOW())",
+        [
+          user_id,
+          first_name,
+          last_name,
+          bio,
+          email,
+          mobile_number,
+          country,
+          profile_picture,
+        ],
+      );
 
-    // 3. Insert into database using 'password_hash' column
-    const sql =
-      "INSERT INTO users(name, email, role, mobile_number, country, profile_picture, created_at, password_hash) VALUES(?,?,?,?,?,?,NOW(),?)";
+      // Insert into passwords table using client_id
+      const hash = await bcrypt.hash(password, 10);
+      await pool.query(
+        "INSERT INTO passwords(client_id, password_hash) VALUES(?,?)",
+        [user_id, hash],
+      );
 
-    await pool
-      .promise()
-      .query(sql, [
-        name,
-        email,
+      // Insert into roles table using client_id
+      await pool.query("INSERT INTO roles(client_id, role) VALUES(?,?)", [
+        user_id,
         role,
-        mobile_number,
-        country,
-        profile_picture,
-        hash,
       ]);
+    } else if (role === "freelancer") {
+      await pool.query(
+        "INSERT INTO freelancers(freelancer_id, first_name, last_name, bio, email, mobile_number, country, profile_picture, create_at) VALUES(?,?,?,?,?,?,?,?,NOW())",
+        [
+          user_id,
+          first_name,
+          last_name,
+          bio,
+          email,
+          mobile_number,
+          country,
+          profile_picture,
+        ],
+      );
 
+      // Insert into passwords table using freelancer_id
+      const hash = await bcrypt.hash(password, 10);
+      await pool.query(
+        "INSERT INTO passwords(freelancer_id, password_hash) VALUES(?,?)",
+        [user_id, hash],
+      );
+
+      // Insert into roles table using freelancer_id
+      await pool.query("INSERT INTO roles(freelancer_id, role) VALUES(?,?)", [
+        user_id,
+        role,
+      ]);
+    } else if (role === "admin") {
+      await pool.query(
+        "INSERT INTO admins(admin_id, first_name, last_name, bio, email, mobile_number, country, profile_picture, create_at) VALUES(?,?,?,?,?,?,?,?,NOW())",
+        [
+          user_id,
+          first_name,
+          last_name,
+          bio,
+          email,
+          mobile_number,
+          country,
+          profile_picture,
+        ],
+      );
+
+      // Insert into passwords table using admin_id
+      const hash = await bcrypt.hash(password, 10);
+      await pool.query(
+        "INSERT INTO passwords(admin_id, password_hash) VALUES(?,?)",
+        [user_id, hash],
+      );
+
+      // Insert into roles table using admin_id
+      await pool.query("INSERT INTO roles(admin_id, role) VALUES(?,?)", [
+        user_id,
+        role,
+      ]);
+    }
     res.status(201).json({ message: "Account created successfully!" });
   } catch (e) {
     console.error(`Database Error: ${e.message}`);
@@ -60,26 +149,75 @@ const loginUser = async (req, res) => {
   }
   const { email, password } = req.body;
 
-  // Look for the hashed password in the 'password_hash' column
-  const sql = "SELECT name, role, password_hash FROM users WHERE email = ?";
-
   try {
-    const [rows] = await pool.query(sql, [email]);
-    if (rows.length === 0)
-      return res.status(404).json({ message: "User not found" });
+    let user = null;
+    let userId = null;
+    let role = null;
 
-    // Compare plain-text password with the stored hash
-    const user = rows[0];
-    const isValid = await bcrypt.compare(password, user.password_hash);
-    if (!isValid) {
-      return res.status(401).json({ message: "Incorrect password" });
+    // Check clients table
+    const [clients] = await pool.query(
+      "SELECT client_id, first_name, last_name FROM clients WHERE email = ?",
+      [email],
+    );
+    if (clients.length > 0) {
+      user = clients[0];
+      userId = user.client_id;
+      role = "client";
     }
 
+    // Check freelancers table if not found in clients
+    if (!user) {
+      const [freelancers] = await pool.query(
+        "SELECT freelancer_id, first_name, last_name FROM freelancers WHERE email = ?",
+        [email],
+      );
+      if (freelancers.length > 0) {
+        user = freelancers[0];
+        userId = user.freelancer_id;
+        role = "freelancer";
+      }
+    }
+
+    // Check admins table if not found yet
+    if (!user) {
+      const [admins] = await pool.query(
+        "SELECT admin_id, first_name, last_name FROM admins WHERE email = ?",
+        [email],
+      );
+      if (admins.length > 0) {
+        user = admins[0];
+        userId = user.admin_id;
+        role = "admin";
+      }
+    }
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Verify password from passwords table
+    const [passRows] = await pool.query(
+      "SELECT password_hash FROM passwords WHERE client_id = ? OR freelancer_id = ? OR admin_id = ?",
+      [userId, userId, userId],
+    );
+
+    if (!passRows || passRows.length === 0) {
+      return res.status(404).json({ message: "Invalid Password!" });
+    }
+
+    const isValid = await bcrypt.compare(password, passRows[0].password_hash);
+    if (!isValid) {
+      return res.status(401).json({ message: "Incorrect Password" });
+    }
+
+    // Generate JWT token
     const token = jwt.sign(
       {
-        name: user.name,
+        user_id: userId,
+        first_name: user.first_name,
+        last_name: user.last_name,
         email: email,
-        role: user.role,
+        role: role,
       },
       jwt_secret,
       { expiresIn: "24h" },
@@ -88,9 +226,15 @@ const loginUser = async (req, res) => {
     res.status(200).json({
       message: "Welcome back!",
       token: token,
+      user: {
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: email,
+        role: role,
+      },
     });
   } catch (e) {
-    console.log(`Error: ${e}`);
+    console.error(`Error: ${e}`);
     return res.status(500).json({ message: "Database error" });
   }
 };
@@ -105,7 +249,7 @@ const getUserData = (req, res) => {
   });
 };
 
-// Sending an OTP to email: -> no yet implemented
+// Sending an OTP to email (not yet implemented)
 const sendOTPEmail = (req, res) => {
   const { email, to_email, from_email, from_password } = req.body;
   if (!email) return res.status(400).json({ message: "Missing email!" });
@@ -119,7 +263,7 @@ const sendOTPEmail = (req, res) => {
   const mailOptions = {
     from: from_email,
     to: to_email,
-    subject: 1`reelance Marketplace: OTP is:`,
+    subject: "Freelance Marketplace: OTP is:",
     text: email,
   };
   transporter.sendMail(mailOptions, (err, info) => {

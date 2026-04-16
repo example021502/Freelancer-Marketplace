@@ -4,11 +4,11 @@ import NavBar from "./NavBar/NavBar";
 
 function Client() {
   return (
-    <div className="w-full h-dvh flex flex-row items-start justify-start space-x-2 p-2">
-      <div className="p-2 rounded-xl items-center justify-start h-full bg-gray-200 flex flex-col space-y-2">
+    <div className="w-full h-dvh overflow-hidden relative flex flex-row items-start justify-start space-x-4 p-4">
+      <div className="w-60 h-full hidden md:flex">
         <NavBar />
       </div>
-      <main className="flex-1 rounded-xl">
+      <main className="flex-1 h-full overflow-y-auto no-scrollbar rounded-xl space-y-4">
         <Outlet />
       </main>
     </div>

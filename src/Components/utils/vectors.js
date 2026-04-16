@@ -4,7 +4,7 @@ import { createAvatar } from "@dicebear/core";
 // avatar
 export const getAvatar = (name) => {
   return createAvatar(lorelei, {
-    seed: name,
+    seed: name || "N/A",
     radius: 5,
     backgroundColor: "b6e3f4",
   }).toDataUri();
@@ -13,7 +13,7 @@ export const getAvatar = (name) => {
 // initials
 export const getInitials = (name) => {
   return createAvatar(initials, {
-    seed: name,
+    seed: name || "N/A",
     radius: 5,
     backgroundColor: ["a2c593", "b6e3f4", "008da2"],
   }).toDataUri();
@@ -22,8 +22,8 @@ export const getInitials = (name) => {
 // icons
 export const getIcon = (name) => {
   return createAvatar(icons, {
-    seed: name,
-    radius: 50,
+    seed: name || "N/A",
+    radius: 20,
     backgroundColor: ["b6e3f4", "c342e3", "d4a5a5"],
   }).toDataUri();
 };

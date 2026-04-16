@@ -7,7 +7,7 @@ function SelectRole({ element, handleInputChange, value }) {
   const targetRef = useRef();
   const [expand, setExpand] = useState(false);
   useEffect(() => {
-    handleInputChange("Client", "role");
+    handleInputChange("client", "role");
   }, []);
   const toggle_expand = () => {
     setExpand((prev) => !prev);
@@ -23,7 +23,7 @@ function SelectRole({ element, handleInputChange, value }) {
     return () => document.removeEventListener("mousedown", updateClick);
   }, []);
 
-  const items = ["Client", "Freelancer"];
+  const items = ["client", "freelancer", "admin"];
   return (
     <div
       ref={targetRef}
@@ -49,6 +49,7 @@ function SelectRole({ element, handleInputChange, value }) {
           {items.map((item) => {
             return (
               <div
+                key={item}
                 onClick={() => {
                   (handleInputChange(item, "role"), toggle_expand);
                 }}

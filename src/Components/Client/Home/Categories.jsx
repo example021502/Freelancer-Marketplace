@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 function Categories() {
   const categories = [
     {
+      icon: "",
       label: "Development & IT",
       id: "development_it",
       comment: "Web, Mobile, Game Dev, Software Engineering, AQ etc...",

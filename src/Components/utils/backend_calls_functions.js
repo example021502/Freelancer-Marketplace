@@ -60,27 +60,27 @@ export const get_user_data = async () => {
   }
 };
 
-// get user by id and table name
-export const getUser = async (table, id, fields = [], target_field = "") => {
+//get_information_common by table name, target_field and field value
+export const get_information_common = async (
+  table_name,
+  target_field,
+  target_value,
+) => {
   try {
-    const clean_fields = fields.length > 0 ? fields.join(",") : "";
     const res = await api.get(
-      `http://localhost:8080/api/get/${table}/${id}?fields=${encodeURIComponent(clean_fields)}&targetField=${encodeURIComponent(target_field)}`,
+      `/get/data/${table_name}/${target_field}/${target_value}`,
     );
-    const status = res?.data?.status;
-    if (status === 500) return showError(res?.data?.message);
-    const data = res?.data?.result;
-    return data;
+    return res?.data?.result;
   } catch (e) {
     console.log(`Error: ${e}`);
     showError(
-      e?.response?.data?.message || "Could not load the user for this post!",
+      e?.response?.data?.message || "Couldn't load data for this post!",
     );
     return null;
   }
 };
 
-// get projects by email and role
+// get projects by email and role for assigned projects display
 export const get_all_projects_by_email_and_role = async (email, role) => {
   try {
     const res = await api.get(
@@ -92,6 +92,38 @@ export const get_all_projects_by_email_and_role = async (email, role) => {
     showError(
       e?.response?.data?.message ||
         "Could not load the projects for this user!",
+    );
+    return null;
+  }
+};
+
+// get_personal information using user_id
+export const get_personal_information = async (user_id) => {
+  try {
+    const response = await api.get(`/get/data/users/user_id/${user_id}`);
+    return response?.data?.result;
+  } catch (e) {
+    console.log(`Error: ${e}`);
+    showError(
+      e?.response?.data?.message ||
+        "Could not load the personal information for this user!",
+    );
+    return null;
+  }
+};
+
+// getting all payments by email
+export const getPaymentsByEmail = async (email) => {
+  try {
+    const response = await api.get(
+      `/get/payments?email=${encodeURIComponent(email)}`,
+    );
+    return response?.data?.result;
+  } catch (e) {
+    console.log(`Error: ${e}`);
+    showError(
+      e?.response?.data?.message ||
+        "Could not load the payments for this user!",
     );
     return null;
   }

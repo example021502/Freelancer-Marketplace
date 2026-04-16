@@ -9,10 +9,12 @@ function Input({
   auto_complete = "off",
   value,
   id,
+  onpaste,
   onchange,
 }) {
   return (
     <input
+      onPaste={(e) => onpaste(e)}
       value={value}
       readOnly={read_only}
       autoComplete={auto_complete}
