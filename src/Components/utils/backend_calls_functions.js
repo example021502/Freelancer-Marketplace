@@ -8,9 +8,7 @@ export const get_projects = async () => {
     return res.data;
   } catch (e) {
     console.log(`Error: ${e}`);
-    return showError(
-      e?.response?.data?.message || "Could not load the projects!",
-    );
+    return showError(e?.response?.data?.message || "Something went wrong!");
   }
 };
 
