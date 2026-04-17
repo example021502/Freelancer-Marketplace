@@ -1,6 +1,6 @@
-import { pool } from "../config/db";
+const pool = require("../config/db");
 
-export const newPost = (req, res) => {
+const newPost = (req, res) => {
   const { form } = req.body;
   const { creator_id, title, description, budget, discount } = form;
 
@@ -9,4 +9,5 @@ export const newPost = (req, res) => {
     [creator_id, title, description, budget, discount],
   );
 };
-a;
+
+module.exports = { newPost };

@@ -16,6 +16,7 @@ export const get_projects = async () => {
 export const login = async (form, navigate, setLoading) => {
   try {
     const res = await api.post("/login", form);
+    console.log(res);
     localStorage.setItem("token", res?.data?.token);
     const { message } = res?.data;
     showSuccess(message);
@@ -32,13 +33,15 @@ export const login = async (form, navigate, setLoading) => {
 };
 
 // singing up
-export const signup = async (new_form, navigate) => {
+export const signup = async (new_form, navigate, setIsLoading) => {
   try {
     const res = await api.post("/add/users", new_form);
     const message = res?.data?.message;
     showSuccess(message);
     navigate("/");
+    setIsLoading(false);
   } catch (e) {
+    setIsLoading(false);
     const message = e?.response?.data?.message;
     console.log(`Error: ${e}`);
     return showError(message);

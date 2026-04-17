@@ -69,6 +69,7 @@ function Signin() {
               >
                 <Label text={el.label} class_name={"text-sm"} />
                 <Input
+                  auto_focus={el.id === "email" ? true : false}
                   onchange={handleInputChange}
                   id={el.id}
                   placeholder={el.placeholder}
@@ -98,7 +99,7 @@ function Signin() {
                       : btn.label
                     : btn.label
                 }
-                class_name={`w-full py-1.5 rounded-xl md:text-[1em] text-lg font-lighter items-center justify-center flex ${loading ? "pointer-events-none" : ""} ${btn.id === "login" ? "bg-green-800 text-gray-200" : "border-green-800 border-2"}`}
+                class_name={`w-full py-1.5 rounded-xl md:text-[1em] text-lg font-lighter items-center justify-center flex ${loading ? "pointer-events-none opacity-60" : ""} ${btn.id === "login" ? "bg-green-800 text-gray-200" : "border-green-800 border-2"}`}
               />
             );
           })}

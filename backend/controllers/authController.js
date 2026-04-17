@@ -226,12 +226,6 @@ const loginUser = async (req, res) => {
     res.status(200).json({
       message: "Welcome back!",
       token: token,
-      user: {
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: email,
-        role: role,
-      },
     });
   } catch (e) {
     console.error(`Error: ${e}`);

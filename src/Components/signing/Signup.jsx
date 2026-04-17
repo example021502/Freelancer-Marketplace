@@ -15,6 +15,7 @@ import { signup } from "../utils/backend_calls_functions";
 import Textarea from "../common/Textarea";
 
 function Signup() {
+  //
   // Update this URL if your dashboard shows .app instead of .dev
 
   // signup elements
@@ -76,6 +77,8 @@ function Signup() {
     },
   ];
 
+  // is loading state
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [expand, setExpand] = useState(false);
 
@@ -112,12 +115,14 @@ function Signup() {
 
     // Remove confirm_password and keep 'password' for the backend to hash
     const { confirm_password, ...new_form } = form;
-    await signup(new_form, navigate);
+    setIsLoading(true);
+    await signup(new_form, navigate, setIsLoading);
   };
 
   // input styles
   const input_styles =
     "w-full cursor-pointer p-3 md:p-2 mt-1 focus:outline-none focus:ring ring-green-800 rounded-xl border border-gray-400";
+  const loading_styles = "pointer-events-none opacity-60";
 
   return (
     <div className="w-full text-sm h-dvh overflow-hidden p-4 items-center justify-center flex">
@@ -196,14 +201,14 @@ function Signup() {
           <Button
             id="register"
             onclick={handle_button_click}
-            text="Register"
-            class_name="w-full py-1.5 rounded-xl bg-green-800 text-gray-200"
+            text={isLoading ? "Registering..." : "Register"}
+            class_name={`w-full py-1.5 rounded-xl bg-green-800 text-gray-200 ${isLoading ? `${loading_styles}` : ""}`}
           />
           <Button
             id="login"
             onclick={() => navigate("/")}
             text="Login"
-            class_name="border-green-800 border-2 w-full py-1.5 rounded-xl"
+            class_name={`border-green-800 border-2 w-full py-1.5 rounded-xl ${isLoading ? `${loading_styles}` : ""}`}
           />
         </div>
 

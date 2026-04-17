@@ -38,16 +38,7 @@ app.use("/api", postsRoutes);
 
 // Server Start
 app.listen(port, "0.0.0.0", () => {
-  console.log(`Server running on port ${port}`);
-  console.log("  POST /api/add/users - User registration");
-  console.log("  POST /api/login - User login");
-  console.log("  GET  /api/userData - Get user data (protected)");
-  console.log("  GET  /api/get/users - Get all users");
-  console.log("  GET  /api/get/projects - Get all projects");
-  console.log("  GET  /api/get/:table/:id - Get specific data from any table");
-  console.log(
-    "GET /api/get/user_projects/:email -Get logged user projects information",
-  );
+  console.log(`app listening at port ${port}`);
 });
 
 module.exports = app;
