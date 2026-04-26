@@ -16,7 +16,7 @@ function Home() {
   const { pathname } = useLocation();
   // checking if the current route path leads to explore component
   const isExplore = pathname.split("/").at(-1) === "explore";
-  const handlePost = () => {};
+
   return (
     <div className="w-full space-y-4 h-full flex flex-col items-start justify-start">
       <HomeTopPart />

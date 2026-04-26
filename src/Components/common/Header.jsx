@@ -4,7 +4,7 @@ import Icon from "./Icon";
 
 function Header({ main_heading, sub_heading, setClosing }) {
   return (
-    <div className="w-full flex flex-row items-center justify-between gap-2">
+    <div className="w-full mb-4 border-b border-gray-400 pb-2 flex flex-row items-center justify-between gap-2">
       <div className="flex-1 flex items-start justify-start flex-col">
         <Label
           text={main_heading || "N/A"}

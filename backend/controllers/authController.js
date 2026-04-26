@@ -22,117 +22,51 @@ const registerUser = async (req, res) => {
     const user_id = v4();
 
     // Check email based on role and insert into appropriate table
-    if (role === "client") {
-      const [exist] = await pool.query(
-        "SELECT email FROM clients WHERE email = ?",
-        [email],
-      );
-      if (exist.length > 0) {
-        return res.status(409).json({ message: "Email already exists" });
-      }
-    }
-    if (role === "freelancer") {
-      const [exist] = await pool.query(
-        "SELECT email FROM freelancers WHERE email = ?",
-        [email],
-      );
-      if (exist.length > 0) {
-        return res.status(409).json({ message: "Email already exists" });
-      }
-    } else if (role === "admin") {
-      const [exist] = await pool.query(
-        "SELECT email FROM admins WHERE email = ?",
-        [email],
-      );
-      if (exist.length > 0) {
-        return res.status(409).json({ message: "Email already exists" });
-      }
-    }
     if (role !== "client" && role !== "freelancer" && role !== "admin")
       return res.status(400).json({ message: "Invalid role" });
 
-    if (role === "client") {
-      await pool.query(
-        "INSERT INTO clients(client_id, first_name, last_name, bio, email, mobile_number, country, profile_picture, create_at) VALUES(?,?,?,?,?,?,?,?,NOW())",
-        [
-          user_id,
-          first_name,
-          last_name,
-          bio,
-          email,
-          mobile_number,
-          country,
-          profile_picture,
-        ],
-      );
+    const checking_sql = `SELECT email FROM clients WHERE email = ? UNION ALL SELECT email FROM freelancers WHERE email = ? UNION ALL SELECT email FROM admins WHERE email = ?`;
+    const [exist] = pool.query(checking_sql, [email, email, email]);
+    if (exist.length > 0)
+      return res.status(400).json({ message: "Email already exists" });
 
-      // Insert into passwords table using client_id
-      const hash = await bcrypt.hash(password, 10);
-      await pool.query(
-        "INSERT INTO passwords(client_id, password_hash) VALUES(?,?)",
-        [user_id, hash],
-      );
+    const sql =
+      role === "client"
+        ? `INSERT INTO clients(client_id, first_name, last_name, bio,  email, mobile_number, country, profile_picture, created_at) VALUES(?,?,?,?,?,?,?,?,NOW())`
+        : role === "freelancer"
+          ? `INSERT INTO freelancers(freelancer_id, first_name, last_name, bio, email, mobile_number, country, profile_picture, create_at) VALUES(?,?,?,?,?,?,?,?,NOW())`
+          : `INSERT INTO admins(admin_id, first_name, last_name, bio, email, mobile_number, country, profile_picture, create_at) VALUES(?,?,?,?,?,?,?,?,NOW())`;
 
-      // Insert into roles table using client_id
-      await pool.query("INSERT INTO roles(client_id, role) VALUES(?,?)", [
+    await pool.query(
+      "INSERT INTO clients(client_id, first_name, last_name, bio, email, mobile_number, country, profile_picture, create_at) VALUES(?,?,?,?,?,?,?,?,NOW())",
+      [
         user_id,
-        role,
-      ]);
-    } else if (role === "freelancer") {
-      await pool.query(
-        "INSERT INTO freelancers(freelancer_id, first_name, last_name, bio, email, mobile_number, country, profile_picture, create_at) VALUES(?,?,?,?,?,?,?,?,NOW())",
-        [
-          user_id,
-          first_name,
-          last_name,
-          bio,
-          email,
-          mobile_number,
-          country,
-          profile_picture,
-        ],
-      );
+        first_name,
+        last_name,
+        bio,
+        email,
+        mobile_number,
+        country,
+        profile_picture,
+      ],
+    );
 
-      // Insert into passwords table using freelancer_id
-      const hash = await bcrypt.hash(password, 10);
-      await pool.query(
-        "INSERT INTO passwords(freelancer_id, password_hash) VALUES(?,?)",
-        [user_id, hash],
-      );
+    // Insert into passwords table using freelancer_id
+    const hash = await bcrypt.hash(password, 10);
+    const column = `${role}_id`;
+    await pool.query("INSERT INTO passwords( ??, password_hash) VALUES(?,?)", [
+      column,
+      user_id,
+      hash,
+    ]);
 
-      // Insert into roles table using freelancer_id
-      await pool.query("INSERT INTO roles(freelancer_id, role) VALUES(?,?)", [
-        user_id,
-        role,
-      ]);
-    } else if (role === "admin") {
-      await pool.query(
-        "INSERT INTO admins(admin_id, first_name, last_name, bio, email, mobile_number, country, profile_picture, create_at) VALUES(?,?,?,?,?,?,?,?,NOW())",
-        [
-          user_id,
-          first_name,
-          last_name,
-          bio,
-          email,
-          mobile_number,
-          country,
-          profile_picture,
-        ],
-      );
+    // Insert into roles table using freelancer_id
+    await pool.query("INSERT INTO roles(??, role) VALUES(?,?)", [
+      column,
+      user_id,
+      role,
+    ]);
 
-      // Insert into passwords table using admin_id
-      const hash = await bcrypt.hash(password, 10);
-      await pool.query(
-        "INSERT INTO passwords(admin_id, password_hash) VALUES(?,?)",
-        [user_id, hash],
-      );
-
-      // Insert into roles table using admin_id
-      await pool.query("INSERT INTO roles(admin_id, role) VALUES(?,?)", [
-        user_id,
-        role,
-      ]);
-    }
     res.status(201).json({ message: "Account created successfully!" });
   } catch (e) {
     console.error(`Database Error: ${e.message}`);
@@ -150,74 +84,38 @@ const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    let user = null;
-    let userId = null;
-    let role = null;
-
-    // Check clients table
-    const [clients] = await pool.query(
-      "SELECT client_id, first_name, last_name FROM clients WHERE email = ?",
-      [email],
-    );
-    if (clients.length > 0) {
-      user = clients[0];
-      userId = user.client_id;
-      role = "client";
-    }
-
-    // Check freelancers table if not found in clients
-    if (!user) {
-      const [freelancers] = await pool.query(
-        "SELECT freelancer_id, first_name, last_name FROM freelancers WHERE email = ?",
-        [email],
-      );
-      if (freelancers.length > 0) {
-        user = freelancers[0];
-        userId = user.freelancer_id;
-        role = "freelancer";
-      }
-    }
-
-    // Check admins table if not found yet
-    if (!user) {
-      const [admins] = await pool.query(
-        "SELECT admin_id, first_name, last_name FROM admins WHERE email = ?",
-        [email],
-      );
-      if (admins.length > 0) {
-        user = admins[0];
-        userId = user.admin_id;
-        role = "admin";
-      }
-    }
-
-    if (!user) {
+    const sql = `
+    SELECT c.client_id, c.first_name, c.last_name, r.role, p.password_hash FROM clients c LEFT JOIN roles r ON c.client_id = r.client_id LEFT JOIN passwords p ON c.client_id = p.client_id WHERE c.email = ? 
+    UNION ALL 
+    SELECT f.freelancer_id, f.first_name, f.last_name, r.role, p.password_hash FROM freelancers f LEFT JOIN roles r ON f.freelancer_id = r.freelancer_id LEFT JOIN passwords p ON f.freelancer_id = p.freelancer_id WHERE f.email = ? 
+    UNION ALL 
+    SELECT a.admin_id, a.first_name, a.last_name, r.role, p.password_hash FROM admins a LEFT JOIN roles r ON a.admin_id = r.admin_id LEFT JOIN passwords p ON a.admin_id = p.admin_id WHERE a.email = ? 
+    `;
+    const [user] = await pool.query(sql, [email, email, email]);
+    if (!user.length > 0)
       return res.status(404).json({ message: "User not found" });
-    }
 
-    // Verify password from passwords table
-    const [passRows] = await pool.query(
-      "SELECT password_hash FROM passwords WHERE client_id = ? OR freelancer_id = ? OR admin_id = ?",
-      [userId, userId, userId],
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      user[0].password_hash,
     );
+    if (!isPasswordValid)
+      return res.status(401).json({ message: "Invalid Password" });
 
-    if (!passRows || passRows.length === 0) {
-      return res.status(404).json({ message: "Invalid Password!" });
-    }
-
-    const isValid = await bcrypt.compare(password, passRows[0].password_hash);
-    if (!isValid) {
-      return res.status(401).json({ message: "Incorrect Password" });
-    }
+    const getUserId = (user) => {
+      const role = user[0]?.role;
+      const custom_id = `${role}_id`;
+      return (user_id = user[0]?.custom_id);
+    };
 
     // Generate JWT token
-    const token = jwt.sign(
+    const token = await jwt.sign(
       {
-        user_id: userId,
-        first_name: user.first_name,
-        last_name: user.last_name,
+        user_id: getUserId(user),
+        first_name: user[0]?.first_name,
+        last_name: user[0]?.last_name,
         email: email,
-        role: role,
+        role: user[0]?.role,
       },
       jwt_secret,
       { expiresIn: "24h" },

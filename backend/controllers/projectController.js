@@ -6,12 +6,12 @@ const getAllProjects = async (req, res) => {
     const sql = `SELECT * FROM projects WHERE visibility = ?`;
     const [projects] = await pool.query(sql, ["public"]);
     if (!projects[0] || projects[0].length === 0)
-      return res.status(400).json({ message: "No projects" });
+      return res.status(400).json({ message: "No projects", succes: true });
 
-    return res.status(200).json({ result: projects });
+    return res.status(200).json({ result: projects, success: true });
   } catch (error) {
     console.error("Database error:", error);
-    return res.status(500).json({ message: "Database Error!" });
+    return res.status(500).json({ message: "Database Error!", success: false });
   }
 };
 

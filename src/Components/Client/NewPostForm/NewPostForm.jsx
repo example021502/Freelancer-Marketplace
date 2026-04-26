@@ -1,46 +1,44 @@
-import React, { useState } from "react";
+{
+  /*
+  LEFT OF CREATING THE IMAGES STATE FOR EACH POST
+  */
+}
+
+import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "../../common/Header";
 import Input from "../../common/Input";
+import Image from "../../common/Image";
 import Label from "../../common/Label";
 import { get_user_data } from "../../utils/backend_calls_functions";
-import { useQuery } from "@tanstack/react-query";
-import { showSuccess } from "../../utils/toastfy_notifications";
+import { showSuccess, showError } from "../../utils/toastfy_notifications";
 import { NewPost } from "./PostingBackendCalls/posts";
 import Button from "../../common/Button";
 import Textarea from "../../common/Textarea";
+import Icon from "../../common/Icon";
 function NewPostForm({ setClosing }) {
-  // user details state
-  const [user, setUser] = useState({});
-
-  //   posting status
+  // tracking loading posting status
   const [posting, setPosting] = useState(false);
-  useQuery({
-    queryKey: ["user"],
-    queryFn: get_user_data(),
-    onSuccess: (data) => {
+
+  // user data
+  const [user, setUser] = useState({});
+  // images
+  const [images, setImages] = useState([]);
+
+  // image link state
+  const [imgLink, setImgLink] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      const data = await get_user_data();
       setUser(data);
-    },
-    onError: (error) => {
-      console.log(error);
-    },
-    onLoading: () => {
-      return (
-        <div
-          className={
-            "w-full flex items-center justify-center inset-0 absolute top-0 left-0 p-4"
-          }
-        >
-          <Label text={"Loading"} class_name={"font-bold text-lg"} />
-        </div>
-      );
-    },
-  });
+    })();
+  }, []);
 
   // new post form
   const [postForm, setPostForm] = useState({
-    creator_id: user?.id || "",
+    creator_id: user?.id,
     title: "",
     description: "",
     budget: "",
@@ -56,15 +54,20 @@ function NewPostForm({ setClosing }) {
       type: "text",
     },
 
-    { label: "Cost", placeholder: "$ 2000", id: "budget" },
-    { label: "Discount(%) (optional)", placeholder: "0.00", id: "discount" },
+    { label: "Cost($)", placeholder: "2000", id: "budget", type: "number" },
+    {
+      label: "Discount(%) (optional)",
+      placeholder: "0.00",
+      id: "discount",
+      type: "number",
+    },
   ];
 
   // styles
   const input_styles =
-    "w-full font-lighter rounded-xl py-1 px-2 border border-gray-200";
+    "w-full font-lighter focus:outline-none focus:ring ring-gray-400 rounded-xl py-1 px-2 border border-gray-400";
   const label_styles = "font-semibold text-sm";
-  const button_styles = "w-full py-2 rounded-xl text-gray-200 font-semibold";
+  const button_styles = `w-full py-2 rounded-xl text-gray-200 font-semibold ${posting ? "pointer-pointer-events-none opacity-60" : ""}`;
 
   //   handle filling the form
   const handleInputChange = (value, id) => {
@@ -72,15 +75,19 @@ function NewPostForm({ setClosing }) {
   };
 
   //   handle posting the form to database
-  const handlePostingForm = () => {
+  const handlePostingForm = async () => {
+    console.log(user);
+    if (posting) return;
+    if (!postForm.creator_id) return showError("Failed : User Error");
     const empty = Object.keys(postForm).filter(
-      (key) => postForm[key] === "" && key !== "discount",
+      (key) =>
+        postForm[key] === "" && key !== "discount" && key !== "creator_id",
     );
     if (empty.length > 0) return showError(`Fill ${empty.join(", ")}`);
 
     try {
       setPosting(true);
-      const res = NewPost(NewPostForm);
+      const res = await NewPost(postForm);
       showSuccess(res.message || "Post created successfully");
       setPosting(false);
       setClosing(false);
@@ -98,6 +105,12 @@ function NewPostForm({ setClosing }) {
       budget: "",
       discount: "",
     });
+  };
+
+  // handle uploading
+  const handleImageChanges = (e) => {
+    console.log(e.target.files);
+    setImages(e.target.files);
   };
 
   return createPortal(
@@ -119,7 +132,7 @@ function NewPostForm({ setClosing }) {
             sub_heading={"post new item"}
             setClosing={setClosing}
           />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-6">
             {elements.map((el) => {
               return (
                 <div
@@ -129,13 +142,38 @@ function NewPostForm({ setClosing }) {
                   <Label text={el.label} class_name={label_styles} />
                   <Input
                     id={el.id}
+                    value={postForm[el.id]}
                     onchange={handleInputChange}
                     class_name={input_styles}
                     placeholder={el.placeholder}
+                    type={el.type}
                   />
                 </div>
               );
             })}
+            <div className="w-full text-[10px] border cursor-pointer border-gray-400 rounded-xl flex flex-row items-center justify-center gap-2">
+              <input
+                onChange={(e) => handleImageChanges(e)}
+                type="file"
+                multiple
+                max={3}
+                id="image-uploader"
+                className="hidden"
+              />
+              <label
+                htmlFor="image-uploader"
+                className="w-full h-full rounded-xl flex items-center justify-center"
+              >
+                {images.length === 0 ? (
+                  <Icon
+                    icon={"ri-upload-cloud-2-line"}
+                    class_name={"text-2xl font-light"}
+                  />
+                ) : (
+                  images.map((i) => i)
+                )}
+              </label>
+            </div>
           </div>
           <div className="w-full flex flex-col items-start justify-start gap-1">
             <Label text={"Description"} />

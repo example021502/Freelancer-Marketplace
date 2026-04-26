@@ -15,7 +15,7 @@ function Input({
 }) {
   return (
     <input
-      onPaste={(e) => onpaste(e)}
+      onPaste={(e) => onpaste && onpaste(e)}
       autoFocus={auto_focus}
       value={value}
       readOnly={read_only}

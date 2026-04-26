@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import React, { useEffect, useState } from "react";
-=======
-import React from "react";
->>>>>>> fd3b9a5c3396bc61f49c76e859831324bfda9ae6
 import Label from "../../common/Label";
 import Icon from "../../common/Icon";
 import { motion, AnimatePresence } from "framer-motion";
