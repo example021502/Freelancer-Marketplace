@@ -1,27 +1,26 @@
 const { image } = require("framer-motion/client");
 const pool = require("../config/db");
+const v4 = require("uuid").v4;
+
 // posting a new post
 const newPost = async (req, res) => {
+  const post_id = v4();
   const { creator_id, title, description, budget, discount, images } = req.body;
+  console.log(creator_id);
   try {
+    // uploading post
     await pool.query(
-      "INSERT INTO posts(creator_id, title, description, budget, created_at, discounts) VALUES(?,?,?,?,NOW(),?)",
-      [creator_id, title, description, budget, discount],
+      "INSERT INTO posts(post_id, creator_id, title, description, budget, created_at, discounts) VALUES(?,?,?,?,?,NOW(),?)",
+      [post_id, creator_id, title, description, budget, discount],
     );
     // only add the images if there are any
     if (images.length > 0) {
-      const totalRows = await pool.query(
-        "SELECT COUNT(*) AS total_rows FROM posts",
-      );
-      const alt_text = [];
-      const image_url = [];
-      for (let i = 0; i < images.length; i++) {
-        alt_text.push(images[i].alt_text);
-        image_url.push(images[i].image_url);
-      }
+      //  mapping the images from array
+      const values = images.map((image) => [post_id, image, title]);
+      // uploading images
       await pool.query(
-        "INSERT INTO images(post_id, image_url, alt_text, uploaded_at) VALUES (?,?,?,NOW())",
-        [totalRows, image_url, alt_text],
+        "INSERT INTO images(post_id, image_url, alt_text) VALUES ?",
+        [values],
       );
     }
     res

@@ -16,11 +16,11 @@ export const get_projects = async () => {
 export const login = async (form, navigate, setLoading) => {
   try {
     const res = await api.post("/login", form);
-    console.log(res);
     localStorage.setItem("token", res?.data?.token);
     const { message } = res?.data;
     showSuccess(message);
     sessionStorage.setItem("log", true);
+    console.log();
     navigate("/client");
     setLoading(false);
   } catch (e) {
